@@ -137,13 +137,13 @@ def get_system_prompt(menu, distritos):
     Si el cliente agrega postres o bebidas, incorpóralos en la tabla de resumen como un plato adicional y calcula el monto total nuevamente con precisión.
     
     Al final, pregúntale al cliente: "¿Estás de acuerdo con el pedido?" y espera su confirmación. 
-    Una vez que el cliente confirme el pedido, pide al cliente el metodo de pago (tarjeta de crédito, efectivo u otra opción disponible). Verifica que haya ingresado un metodo de pago antes de continuar.
-    Luego, de confirmar el metodo de pago, registra la hora actual de Perú como el timestamp {hora_lima} de la confirmación. 
+    Después, de que el cliente confirme el pedido, pide al cliente el metodo de pago (tarjeta de crédito, efectivo u otra opción disponible). Verifica que haya ingresado un metodo de pago por parte del cliente antes de continuar.
+    Luego, de verificar el metodo de pago, registra la hora actual de Perú como el timestamp {hora_lima} de la confirmación. 
      
     El pedido confirmado será:\n
     {display_confirmed_order([{'Plato': '', 'Cantidad': 0, 'Precio Total': 0}])}\n
     
-    Recuerda siempre confirmar que el pedido, el método de pago y el lugar de entrega del pedido estén completos y correctos antes de registrarlo.
+    Recuerda siempre confirmar que el pedido y el método de pago estén hayan sido ingresados, completos y correctos antes de registrarlo.
     """
     return system_prompt.replace("\n", " ")
    
@@ -155,7 +155,7 @@ def extract_order_json(response):
     	- 'Platos': una lista de platos donde cada plato incluye su cantidad y precio_total.
     	- 'Total': el monto total del pedido.
     	- 'metodo de pago': el método de pago elegido por el cliente.
-    	- 'lugar_entrega': el lugar de entrega en la dirección del local o en el distrito indicado por el cliente.
+    	- 'lugar_entrega': el lugar de entrega (en la dirección del local o en el distrito especificado por el cliente).
     	- 'timestamp_confirmacion': la marca de tiempo del momento en que se confirma el pedido.
 
     	Si algún campo como 'metodo de pago', 'lugar_entrega' o 'timestamp_confirmacion' no aparece explícitamente en la respuesta del cliente, asigna el valor null a ese campo.
@@ -171,7 +171,7 @@ def extract_order_json(response):
             {"role": "user", "content": prompt}
         ],
         model="gpt-3.5-turbo",
-        temperature=0.2,
+        temperature=0,
         max_tokens=300,
         top_p=1,
         stop=None,
@@ -208,7 +208,7 @@ def extract_order_json(response):
         # Manejo de error en caso de que el JSON no sea válido
         return {}
 
-def generate_response(prompt, temperature=0.1,max_tokens=1000):
+def generate_response(prompt, temperature=0,max_tokens=1000):
     """Enviar el prompt a Groq y devolver la respuesta con un límite de tokens."""
     st.session_state["messages"].append({"role": "user", "content": prompt})
 
@@ -275,3 +275,5 @@ if prompt := st.chat_input():
     with st.chat_message("assistant", avatar="👨‍🍳"):
         st.markdown(output)
     
+
+
